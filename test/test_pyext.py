@@ -1,4 +1,4 @@
-import sys, inspect, types, py.test
+import sys, inspect, types, pytest
 from pyext import *
 
 def test_overload_argc():
@@ -11,8 +11,9 @@ def test_overload_argc():
     assert f() == 0
     assert f(1) == 1
     assert f(1, 2) == 2
-    with py.test.raises(TypeError): f(1, 2, 3)
-    assert len(inspect.getargspec(f).args) == 0
+    with pytest.raises(TypeError): f(1, 2, 3)
+    argspec_func = getattr(inspect, 'getargspec', inspect.getfullargspec)
+    assert len(argspec_func(f).args) == 0
 
 def test_overload_args():
     @overload.args(str, int)
@@ -27,8 +28,9 @@ def test_overload_args():
     assert f(0) == int
     assert f('s') == str
     assert f('s', 0) == (str, int)
-    with py.test.raises(TypeError): f(0, 's')
-    assert len(inspect.getargspec(f).args) == 0
+    with pytest.raises(TypeError): f(0, 's')
+    argspec_func = getattr(inspect, 'getargspec', inspect.getfullargspec)
+    assert len(argspec_func(f).args) == 0
     class x(object):
         @overload.args(str, is_cls=True)
         def f(self, s): return 1
@@ -99,4 +101,4 @@ if sys.version_info.major == 3:
         x.__annotations__ = {'a': int, 'b': str}
         x = overload.args(None)(x)
         assert x(1, 's') == 0
-        with py.test.raises(TypeError): x(1, 2)
+        with pytest.raises(TypeError): x(1, 2)
