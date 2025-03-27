@@ -115,12 +115,13 @@ else:
 def _gettypes(args):
     return tuple(map(type, args))
 
-oargspec = inspect.getargspec
+if hasattr(inspect, 'getargspec'):
+    oargspec = inspect.getargspec
 
-def _argspec(func):
-    return _targspec(func, oargspec)
+    def _argspec(func):
+        return _targspec(func, oargspec)
 
-inspect.getargspec = _argspec
+    inspect.getargspec = _argspec
 
 try:
     import IPython
